@@ -11,7 +11,7 @@ A terminal-first course in Python programming and software engineering. Start wi
 
 ## Start here
 
-Follow [local setup](setup.md), then begin [Lesson 1.1](module01-foundations/lesson01-execution.md). Read before running examples, write predictions first, and keep your implementation and answers beside each exercise specification. Create source files empty; the course provides requirements rather than completed exercise solutions.
+Follow [local setup](setup.md) for Python installation on macOS, Linux, or Windows and a first-run check, then begin [Lesson 1.1](module01-foundations/lesson01-execution.md). Read before running examples, write predictions first, and keep your implementation and answers beside each exercise specification. Create source files empty; the course provides requirements rather than completed exercise solutions.
 
 The existing Modules 01–04 and saved learner work are retained. Modules 05–10 extend the original roadmap with three lessons, three exercises, and a 100-point assessment per module. Early lessons remain self-contained; their Mother connection describes preparation rather than a requirement to maintain one evolving program from day one.
 
