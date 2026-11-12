@@ -1,0 +1,95 @@
+# Public course files only. Everything else is local learner work by default.
+# Keep answers, code, projects, notes, evidence, credentials, and generated files private.
+# To publish a NEW course file, add its exact root-relative path below.
+# Changes to existing public files remain visible to Git.
+# This does not filter personal edits made inside an allowed course file.
+# Ignore rules do not remove files from existing commits or override git add -f.
+
+# Ignore all files, but traverse directories to reach the explicit public files.
+*
+!*/
+
+# Public course manifest
+!/.gitignore
+!/README.md
+!/setup.md
+!/module01-foundations/README.md
+!/module01-foundations/assessment.md
+!/module01-foundations/exercises/lesson01/lesson01.md
+!/module01-foundations/exercises/lesson02/lesson02.md
+!/module01-foundations/exercises/lesson03/lesson03.md
+!/module01-foundations/lesson01-execution.md
+!/module01-foundations/lesson02-types.md
+!/module01-foundations/lesson03-collections.md
+!/module02-control-flow/README.md
+!/module02-control-flow/assessment.md
+!/module02-control-flow/exercises/lesson01/lesson01.md
+!/module02-control-flow/exercises/lesson02/lesson02.md
+!/module02-control-flow/exercises/lesson03/lesson03.md
+!/module02-control-flow/lesson01-loops.md
+!/module02-control-flow/lesson02-conditions.md
+!/module02-control-flow/lesson03-functions.md
+!/module03-scope-state/README.md
+!/module03-scope-state/assessment.md
+!/module03-scope-state/exercises/lesson01/lesson01.md
+!/module03-scope-state/exercises/lesson02/lesson02.md
+!/module03-scope-state/exercises/lesson03/lesson03.md
+!/module03-scope-state/lesson01-scope.md
+!/module03-scope-state/lesson02-references.md
+!/module03-scope-state/lesson03-state.md
+!/module04-modules-packages-imports/README.md
+!/module04-modules-packages-imports/assessment.md
+!/module04-modules-packages-imports/exercises/lesson01/lesson01.md
+!/module04-modules-packages-imports/exercises/lesson02/lesson02.md
+!/module04-modules-packages-imports/exercises/lesson03/lesson03.md
+!/module04-modules-packages-imports/lesson01-modules.md
+!/module04-modules-packages-imports/lesson02-packages.md
+!/module04-modules-packages-imports/lesson03-dependencies.md
+!/module05-object-oriented-programming/README.md
+!/module05-object-oriented-programming/assessment.md
+!/module05-object-oriented-programming/exercises/lesson01/lesson01.md
+!/module05-object-oriented-programming/exercises/lesson02/lesson02.md
+!/module05-object-oriented-programming/exercises/lesson03/lesson03.md
+!/module05-object-oriented-programming/lesson01-classes-and-invariants.md
+!/module05-object-oriented-programming/lesson02-data-models-and-composition.md
+!/module05-object-oriented-programming/lesson03-interfaces-and-polymorphism.md
+!/module06-software-architecture/README.md
+!/module06-software-architecture/assessment.md
+!/module06-software-architecture/exercises/lesson01/lesson01.md
+!/module06-software-architecture/exercises/lesson02/lesson02.md
+!/module06-software-architecture/exercises/lesson03/lesson03.md
+!/module06-software-architecture/lesson01-contracts-and-boundaries.md
+!/module06-software-architecture/lesson02-dependency-injection.md
+!/module06-software-architecture/lesson03-errors-and-observability.md
+!/module07-testing-debugging-reliability/README.md
+!/module07-testing-debugging-reliability/assessment.md
+!/module07-testing-debugging-reliability/exercises/lesson01/lesson01.md
+!/module07-testing-debugging-reliability/exercises/lesson02/lesson02.md
+!/module07-testing-debugging-reliability/exercises/lesson03/lesson03.md
+!/module07-testing-debugging-reliability/lesson01-unit-tests-and-fixtures.md
+!/module07-testing-debugging-reliability/lesson02-tracebacks-and-regressions.md
+!/module07-testing-debugging-reliability/lesson03-integration-and-failure-tests.md
+!/module08-files-persistence-system-interfaces/README.md
+!/module08-files-persistence-system-interfaces/assessment.md
+!/module08-files-persistence-system-interfaces/exercises/lesson01/lesson01.md
+!/module08-files-persistence-system-interfaces/exercises/lesson02/lesson02.md
+!/module08-files-persistence-system-interfaces/exercises/lesson03/lesson03.md
+!/module08-files-persistence-system-interfaces/lesson01-files-json-and-validation.md
+!/module08-files-persistence-system-interfaces/lesson02-sqlite-transactions-and-replay.md
+!/module08-files-persistence-system-interfaces/lesson03-command-line-and-packaging.md
+!/module09-advanced-python-machine-learning/README.md
+!/module09-advanced-python-machine-learning/assessment.md
+!/module09-advanced-python-machine-learning/exercises/lesson01/lesson01.md
+!/module09-advanced-python-machine-learning/exercises/lesson02/lesson02.md
+!/module09-advanced-python-machine-learning/exercises/lesson03/lesson03.md
+!/module09-advanced-python-machine-learning/lesson01-iterators-and-generators.md
+!/module09-advanced-python-machine-learning/lesson02-fitting-a-baseline.md
+!/module09-advanced-python-machine-learning/lesson03-evaluation-and-leakage.md
+!/module10-mother-capstone/README.md
+!/module10-mother-capstone/assessment.md
+!/module10-mother-capstone/exercises/lesson01/lesson01.md
+!/module10-mother-capstone/exercises/lesson02/lesson02.md
+!/module10-mother-capstone/exercises/lesson03/lesson03.md
+!/module10-mother-capstone/lesson01-specification-and-domain.md
+!/module10-mother-capstone/lesson02-persistence-and-learning-pipeline.md
+!/module10-mother-capstone/lesson03-verification-and-handoff.md
