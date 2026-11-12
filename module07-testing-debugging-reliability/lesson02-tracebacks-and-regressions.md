@@ -43,19 +43,17 @@ The second comparison is correct. The defect is that the false branch performs n
 
 For an exception, inspect the input at the failing frame before changing access syntax. `reading["memory"]` can raise because the schema requires only CPU, because a malformed record missed validation, or because the code misspelled a required key. Substituting `.get("memory", 0)` would suppress the symptom while inventing a zero measurement.
 
-## 7.2.3 — State a hypothesis and change one thing
+## 7.2.3 — Investigate one hypothesis at a time
 
-Hypothesis: the flag survives beyond the observation it describes. Inspect `high` on both iterations. You can insert a temporary print or use `breakpoint()`, then `next`, `print(high)`, and `continue` in the debugger. Remove temporary output before delivery. Recompute the flag for each current value, and add a test for `[91, 45] -> [True, False]`.
-
-## 7.2.4 — Use the debugger to answer one question
+Hypothesis: the flag survives beyond the observation it describes. Inspect `high` on both iterations with a temporary print or `breakpoint()`, then test the correction: recompute the flag for each current value and expect `[91, 45] -> [True, False]`. Remove temporary output before delivery.
 
 At `breakpoint()`, `next` advances within the current frame; `step` can enter a called function; `print(expression)` inspects a value; `continue` resumes execution. Place the breakpoint immediately before the point where expectation and observation diverge. The goal is evidence for a hypothesis, not stepping through every line by habit.
 
-A minimal reproduction removes irrelevant components while retaining the failure. Two CPU readings are enough for the stale flag; a database, logging setup, and CLI are unnecessary. Keep that small case in the regression suite after fixing the implementation, then run the surrounding suite to check interactions.
+A minimal reproduction removes irrelevant components while retaining the failure. Here the two-reading example is enough; a database, logging setup, and CLI would add distractions. Keep this case in the regression suite and run the surrounding suite after the fix.
 
 The original failure evidence belongs in notes, not as a permanently broken production function. Your final code should express the intended per-observation decision. Mother will benefit from a compact history of what failed and which contract the regression protects.
 
-## 7.2.5 — A regression test protects meaning
+## 7.2.4 — A regression test protects meaning
 
 First show that the test fails with the faulty implementation. Then fix it and show it passes. This establishes that the test can detect that particular bug; it does not prove the absence of every bug. Also check the opposite order and repeated values, because state-related defects often depend on sequence.
 

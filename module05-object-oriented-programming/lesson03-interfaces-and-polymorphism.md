@@ -41,13 +41,11 @@ A method returning `"normal"` would be a subtle break. That nonempty string is t
 
 ## 5.3.3 — Substitution needs observable agreement
 
-A fake policy returning `False` can help check orchestration. It cannot prove a real policy computes correctly. Test the policy directly as well. A replacement that prints, mutates input, or returns a string breaks a caller's reasonable assumptions even if the method name matches.
+A fake policy returning `False` can help check orchestration. It cannot prove a real policy computes correctly. Test the policy directly, and include side-effect expectations such as no printing or input mutation in its contract.
 
-Inheritance shares behavior through a base class. It also creates a relationship that future changes must respect. Use it when substitutability is intentional. Start Mother with composed components and small explicit contracts. The test framework in Module 07 is a good example of purposeful inheritance: a test class inherits the runner's supported assertion methods.
+## 5.3.4 — Choose between inheritance, composition, and callables
 
-## 5.3.4 — Inheritance is a commitment
-
-A subclass inherits accessible behavior from its base class. That can reduce duplication, but callers may then assume the subclass preserves the base class's contract. A history should not inherit from a reading just to reuse a `device` attribute: history represents a collection and has different operations and invariants.
+A subclass inherits accessible behavior from its base class. That can reduce duplication, but callers may then assume the subclass preserves the base class's contract. The test framework in Module 07 uses this relationship to supply supported assertion methods. A history should not inherit from a reading just to reuse a `device` attribute: history represents a collection and has different operations and invariants.
 
 You can see composition in the evaluator: it receives a policy object and uses it without becoming a kind of policy. A future learned policy could own fitted parameters while the evaluator's iteration stays the same. You do not need to implement that future policy now.
 
@@ -58,9 +56,7 @@ def classify_values(values, predicate):
     return [predicate(value) for value in values]
 ```
 
-Here the comprehension means “evaluate the expression once for each value and collect the results.” `predicate` is a supplied function or other callable; it is invoked inside the loop. Choose between a callable and an object by the lifetime and behavior you need, rather than assuming one technique is always more advanced.
-
-## 5.3.5 — Choose the smallest useful abstraction
+Here the comprehension means “evaluate the expression once for each value and collect the results.” `predicate` is a supplied function or other callable; it is invoked inside the loop.
 
 If a policy has no state, accepting a function may be simpler than accepting an object. If it owns configuration or fitted parameters, an object can make that lifetime clear. You do not need an abstract base class or a third-party framework to start. Module 06 will apply the same idea to observation sources and storage boundaries.
 

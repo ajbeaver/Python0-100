@@ -55,15 +55,11 @@ Passing a generator to `list` materializes everything. Holding every result in a
 
 For simple line-oriented data, iterate a file handle rather than reading it all at once. For Mother, the capstone uses a deliberately bounded JSON list: at most 10,000 records. A streaming JSON parser is outside this course's core. Reject oversized batches before storage.
 
-## 9.1.5 — Laziness changes failure timing
+## 9.1.5 — Failure timing and the batch contract
 
-A validation generator can yield two good records and fail on the third. If the caller commits each yielded row separately, whole-batch atomicity is lost. Either materialize and validate a bounded batch first, or retain a transaction across the entire iteration and roll it back on failure.
+A validation generator can yield two good records and fail on the third. Committing each yielded row separately would lose the whole-batch atomicity established in Module 08.
 
-Mother's later evaluation can consume ordered history with explicit limits. Start with correctness and measurable memory behavior before adding concurrency.
-
-## 9.1.6 — Make failure timing part of the contract
-
-If sequence 2 arrives after sequence 3, the generator can raise only when it reaches that input. A `try` block surrounding creation alone cannot catch this later error. The consumer must handle failures during consumption and decide what to do about earlier yielded values. That is why a storage contract cannot change from atomic batch import to partial commits merely because a generator looks convenient.
+If sequence 2 arrives after sequence 3, the generator can raise only when it reaches that input. A `try` block surrounding creation alone cannot catch this later error. The consumer must handle failures during consumption. Either materialize and validate a bounded batch first, or retain one transaction across consumption and roll it back on failure. A generator changes when work happens, not the caller's batch contract.
 
 ## Self-review
 

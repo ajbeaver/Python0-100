@@ -32,7 +32,7 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-Save this scratch example as `test_threshold.py`. Run `python -m unittest -v test_threshold` from its directory. A test method starts with `test_`. The framework discovers and runs the test methods; the next sections explain their execution and state isolation.
+Save this scratch example as `test_threshold.py`. Run `python -m unittest -v test_threshold` from its directory.
 
 ## 7.1.2 — Read the test as ordinary Python
 
@@ -44,8 +44,6 @@ The main guard supports direct script execution. The command `python -m unittest
 
 If the only tested value is 90, both `cpu > 80` and the incorrect `cpu >= 80` pass. The value 80 separates those implementations because the contract says equality is normal. A useful boundary set is 79, 80, and 81; endpoints 0 and 100 check the valid domain's extremes.
 
-For a rejected state change, capture the valid state, invoke the invalid operation inside `assertRaises`, then inspect state afterward. These checks prove separate facts: the operation reports a rejection, and it preserves its previous state. Do not calculate the expected state by running the update method again.
-
 A **fixture** is the initial state and resources a test needs. Fresh instance construction in `setUp` is often sufficient. Copying a reference to one module-global list does not create a fresh fixture, even when each test gets a new test-case object.
 
 Mother's suite will grow with its public contracts. At this point, test policy and state ownership. File parsing and database transactions get their own cases when those boundaries exist; testing an imagined future architecture now would make the suite harder to maintain without proving current behavior.
@@ -56,7 +54,7 @@ For `Meter.set_value`, assert both the exception type and the old value afterwar
 
 ## 7.1.5 — Test the public promise
 
-Cover CPU 0, threshold equality, just above threshold, and 100. Include two distinct histories and warning-to-normal sequences. A frozen-record test does not prove the input parser rejects malformed JSON; those are separate boundaries.
+Extend boundary cases with two distinct histories and warning-to-normal sequences. A frozen-record test does not prove the input parser rejects malformed JSON; those are separate boundaries.
 
 Mother's tests should answer useful questions: can one device contaminate another, can invalid input alter history, and can the same batch be evaluated twice without changed results? Avoid assertions about private list names unless that structure is itself a requirement. A refactor preserving behavior should keep these tests meaningful.
 

@@ -23,13 +23,11 @@ An **oracle** is how a test determines the expected answer. For an integrated th
 
 A recording fake can be a plain object whose method appends received arguments to a list. It lets a test ask whether the service attempted a write and which values it supplied. It should implement the same boundary contract as the real writer, including failure behavior the test needs. It need not imitate an entire database.
 
-## 7.3.3 — Resources must belong to a test
+## 7.3.3 — Resource ownership and cleanup
 
-Module 08 will introduce disk I/O. `tempfile.TemporaryDirectory()` gives each test a disposable directory, and cleanup occurs when its context exits. Never use a real user database as a fixture. Use `pathlib.Path(directory) / "history.sqlite"` to construct a temporary path.
+Module 08 will introduce disk I/O. Use disposable test resources rather than a real user database. The following example shows how `tempfile.TemporaryDirectory()` owns a directory for one test operation.
 
 The recording fake establishes service-level behavior. A real temporary database test in Module 08 will establish whether a database transaction actually rolls back; keep that future integration claim separate.
-
-## 7.3.4 — Cleanup is a resource guarantee
 
 A context manager has an entry and exit lifecycle. The `with` statement arranges cleanup when execution leaves its body, including when an exception escapes. You do not need to implement that protocol to use a standard-library context manager.
 
@@ -43,15 +41,15 @@ with TemporaryDirectory() as directory:
 print(Path(directory).exists())
 ```
 
-This prints `True` then `False`. Constructing the path does not create the file; the directory itself exists only for the context's lifetime. In Module 08, create real temporary files/databases there to test their actual behavior.
+This prints `True` then `False`. Constructing the path does not create the file; the directory itself exists only for the context's lifetime. In Module 08, use the same path construction with `"history.sqlite"` for a real temporary database test.
 
-## 7.3.5 — Invariants cover many sequences
+## 7.3.4 — Invariants cover many sequences
 
-A history snapshot should never shrink after a successful append. A rejected reading should never increase its length. Independent histories should never share additions. Exercise a bounded sequence with `subTest` or a fixed-seed local `random.Random(0)` generator and compare with a simple independent expected list.
+A history snapshot should never shrink after a successful append. A rejected reading should never increase its length. Independent histories should never share additions. Exercise a bounded sequence, optionally generated with a fixed-seed local `random.Random(0)`, and compare with a simple independent expected list.
 
-Random testing supplies examples, not a proof. Deterministic boundary tests remain essential. A reproducible seed and recorded failing input let another person investigate. Mother’s reliability case combines narrow tests, sequence tests, and later a clean command-line run from an empty database.
+Random testing supplies examples, not a proof, so retain deterministic boundary cases. A sequence failure needs the more specific evidence described next.
 
-## 7.3.6 — Read a sequence failure precisely
+## 7.3.5 — Read a sequence failure precisely
 
 Suppose a history test fails after the twelfth operation. Retain the initial state, operation sequence, and expected snapshot at that point. A seed can reproduce generated choices, but the concrete sequence is easier to inspect and remains useful if the generator changes later.
 

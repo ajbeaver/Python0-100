@@ -19,7 +19,7 @@ Persist validated CPU observations, not only “high” labels. A later threshol
 
 Extend Module 09's artifact with a dataset fingerprint and split metadata. Compute SHA-256 over UTF-8 JSON encoding of the complete ordered rows as `[device, sequence, float(cpu)]` arrays, using `ensure_ascii=True`, `allow_nan=False`, and `separators=(",", ":")`. Normalize any zero CPU to `0.0` so negative zero and positive zero share one canonical representation. The outer array is ordered by device then sequence.
 
-This fingerprint binds evaluation to the exact imported dataset used by `train`, including held-out rows. It is provenance, not a learned feature. Never pass held-out CPU values into the fitting function. Store schema version, model kind, tolerance, fingerprint, split rule `chronological-60-20-20`, per-device split counts, training mean, last training value, and trained-through sequence.
+This fingerprint binds evaluation to the exact imported dataset used by `train`. The artifact also records the model parameters and the split rule `chronological-60-20-20`.
 
 Use these exact top-level artifact keys: `schema_version`, `model_kind`, `tolerance`, `dataset_sha256`, `split_rule`, and `devices`. Each device entry has exactly `mean`, `count`, `trained_through`, `last_training_value`, `train_count`, `validation_count`, and `test_count`. Here `count` equals `train_count`; all three split counts must be positive integers excluding booleans. `last_training_value` is a finite CPU in [0, 100]. The fingerprint is 64 lowercase hexadecimal characters. Counts, device names, and training summaries must agree with the current database and split. Reject unknown fields rather than silently extending version 1.
 
@@ -37,7 +37,7 @@ The digest is sensitive to changed values, identities, added rows, and missing r
 
 On load, check exact required fields, supported version/kind/split rule, device coverage, finite numeric values, integer counts, and fingerprint shape. Reject duplicate JSON keys. Before evaluation, recompute the dataset fingerprint and split metadata and require a match. A changed database requires a new training run and a new output path; do not silently evaluate a stale artifact.
 
-For this teaching application, also recompute training summaries from the training slices and compare them with the artifact. This verifies internal consistency. It does not authenticate who created a model: a hash and self-consistent JSON are not a signature.
+Also recompute training summaries from the training slices and compare them with the artifact. This is an internal-consistency check, separate from checking the dataset fingerprint; neither authenticates the model's author.
 
 ## 10.2.5 — Trace two independent consistency checks
 

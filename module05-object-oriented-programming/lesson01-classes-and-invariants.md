@@ -35,7 +35,7 @@ second = Meter(20)
 print(first.is_high(80), second.is_high(80))
 ```
 
-Predict the output before running this in an empty scratch file. The two objects have separate `_value` attributes. `first.is_high(80)` supplies `first` as `self`; the explicit argument supplies `threshold`.
+Predict the output before running this in an empty scratch file. In `first.is_high(80)`, `first` supplies `self` and 80 supplies `threshold`.
 
 ## 5.1.2 — Trace construction and a method call
 
@@ -73,8 +73,6 @@ A leading underscore means “internal implementation”; it does not enforce pr
 ## 5.1.5 — Class attributes have a different lifetime
 
 Putting `readings = []` directly inside a class body creates one list associated with the class, shared through ordinary instance lookup. Creating `self.readings = []` inside `__init__` creates a fresh list per instance. This is Module 03's ownership problem expressed through objects.
-
-Mother needs objects only where identity, state, or an invariant makes them useful. A stateless threshold calculation can remain a function.
 
 ## 5.1.6 — When a class earns its place
 

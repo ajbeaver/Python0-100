@@ -54,13 +54,11 @@ A frozen configuration record makes accidental updates harder. It does not repla
 
 Configuration commonly arrives as an optional value. If `override` is `None`, use the default. If it is 0, use zero: it is a valid threshold under the course contract. The expression `override or 80` would incorrectly replace zero with 80 because zero is falsy.
 
-Resolve precedence with an explicit absence check, then validate the chosen value. Make that effective configuration visible in results or run evidence. This allows a failing test or a surprising warning to be reproduced without guessing which source supplied the threshold.
-
-Dependency injection also exposes lifetime. An entry point can construct one policy for a run and supply it to several operations. A test can supply a counting source or a rejecting policy without editing the service. This flexibility comes from an ordinary argument boundary; adding a dependency-container framework would not clarify the small program further.
+Resolve precedence with an explicit absence check, then validate the chosen value before opening output resources.
 
 ## 6.2.5 — Keep effects observable
 
-A fake source can count how often it is called and return fixed readings. It should be called once per assessment run. A second call to obtain a count could observe a different sample or exhaust an iterator. Capture the batch once, then derive its count and results from that same batch.
+A counting fake source can check the one-acquisition contract demonstrated above. The entry point can also construct one policy per run and supply it to several operations, making both acquisition and configuration lifetimes explicit.
 
 Injection does not require a container library. Prefer an explicit constructor or function argument while the system is small. Hidden dependency lookup makes order-sensitive behavior harder to explain. In Mother, the entry point owns wiring, the source owns acquisition, and the core owns classification.
 

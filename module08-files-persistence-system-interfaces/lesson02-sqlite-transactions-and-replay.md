@@ -13,7 +13,7 @@
 
 ## 8.2.1 — Identity makes replay precise
 
-A row in Mother's history is identified by `(device, sequence)`. Reimporting exactly the same identity and CPU is an idempotent replay: it adds nothing. The same identity with a different CPU is a conflict and must reject the entire batch. Avoid a blanket `INSERT OR IGNORE`, which can conceal that conflict.
+A row in Mother's history is identified by `(device, sequence)`. The primary key below enforces that identity; the import policy must also distinguish an identical replay from a conflicting value.
 
 ```sql
 CREATE TABLE observations (
@@ -28,11 +28,11 @@ SQL defines tables, columns, and constraints. `SELECT` reads rows; `INSERT` adds
 
 ## 8.2.2 — Think of the primary key as a question
 
-The key asks, “Have we already stored this observation identity?” It does not answer, “Is this new representation consistent with it?” That second question requires comparing CPU values. Three cases follow: missing identity means insertion; same identity and equal numeric CPU means unchanged; same identity and unequal CPU means conflict.
+The key asks, “Have we already stored this observation identity?” It does not answer, “Is this new representation consistent with it?” Compare CPU values to distinguish three cases: insert a missing identity, leave an equal numeric replay unchanged, or reject the whole batch on a conflicting value. This makes replay idempotent: importing the same data again adds nothing. A blanket `INSERT OR IGNORE` would conceal conflicts.
 
 Using numeric equality means CPU `20` and `20.0` represent the same reading under this contract. It does not authorize approximate comparisons: 20.0001 is a different value. Store and compare the validated numeric representation deliberately.
 
-## 8.2.3 — Bind values, do not build SQL from input
+## 8.2.3 — Bind values separately from SQL structure
 
 ```python
 row = connection.execute(
@@ -43,13 +43,11 @@ row = connection.execute(
 
 Question marks are placeholders for values. They are not placeholders for table names. `fetchone()` returns a row tuple or `None`. Compare an existing CPU with the incoming validated numeric value; use exact equality for this course's stored replay contract.
 
-## 8.2.4 — Keep values and SQL structure separate
-
 A placeholder lets the database treat a device name containing an apostrophe as data. String interpolation would mix that value with SQL punctuation and can change the statement's meaning. Constraints provide a second boundary when application code makes a mistake, but they do not encode every domain rule: a range constraint alone does not prove a device name is nonempty.
 
 The single-writer assumption keeps the read-compare-insert sequence understandable. It does not make the design a general concurrent ingestion service. If multiple writers become a requirement, revisit transaction acquisition, locking, conflicts, and retries together rather than adding a broad retry around arbitrary exceptions.
 
-## 8.2.5 — One transaction owns one batch
+## 8.2.4 — One transaction owns one batch
 
 With Python 3.12+, `sqlite3.connect(path, autocommit=False)` selects explicit transaction behavior. Use `with connection:` around the complete batch: success commits; an exception leaving the block rolls back. Close the connection in `finally`; its transaction context does not close it. Create and commit the schema separately before import so rollback demonstrations focus on row changes.
 
@@ -69,11 +67,11 @@ def store_batch(path, rows, import_validated_rows):
 
 This fragment assumes schema initialization has already committed. A `return` from a successful `with` block still runs its context exit before returning to the caller. Do not catch and suppress a conflict inside that block: normal exit would commit instead of rolling back.
 
-Validate the batch before opening the write operation. Within the transaction, check each existing identity and either skip an identical row, insert a new row, or raise a conflict. This course assumes a single writer; concurrent ingestion needs additional locking and retry design.
+Validate the batch before opening the write operation, then apply the identity policy inside the transaction. The single-writer assumption above is part of this guarantee.
 
 A failed batch can leave an initialized empty database file. The required guarantee is unchanged observation rows, not disappearance of the file. On readback, use `ORDER BY device, sequence`; insertion order is not a database promise.
 
-## 8.2.6 — Trace a late conflict
+## 8.2.5 — Trace a late conflict
 
 Suppose the database initially contains only `(node01, 0, 20)`. A batch first adds `(node02, 0, 30)` and then attempts `(node01, 0, 21)`.
 

@@ -40,7 +40,7 @@ from mother import evaluation
 
 This refers to the `mother.evaluation` module. Package names are not merely decorative: they provide qualification, so unrelated projects can have modules with similar short filenames without necessarily sharing an import name.
 
-`__init__.py` is executed when an ordinary package is initialized by import. For now, keep it empty: it is **not** a required location for application setup, logging initialization, or side effects. Later, package API design may justify selective exports from it.
+`__init__.py` is executed when an ordinary package is initialized by import. For now, keep it empty to avoid hidden initialization work. Later, package API design may justify selective exports from it.
 
 ## 4.2.2 — Absolute versus relative imports
 
@@ -108,9 +108,7 @@ A `ModuleNotFoundError` means the requested module was not found using the activ
 
 ## 4.2.5 — Package names and `__init__.py`
 
-A package has a `__path__` used to search for its submodules. Ordinary package imports initialize the package first, so code inside `__init__.py` may execute before a requested submodule loads.
-
-For the student projects, keep `__init__.py` empty unless an assignment explicitly asks otherwise. An empty file is a deliberate design choice: it gives us a package boundary without hidden initialization work.
+A package has a `__path__` used to search for its submodules. Ordinary imports initialize the package before loading the requested submodule, which explains why work in `__init__.py` can affect every importer. An empty initializer gives the student projects a package boundary without those effects.
 
 ### What `__init__.py` does not do
 

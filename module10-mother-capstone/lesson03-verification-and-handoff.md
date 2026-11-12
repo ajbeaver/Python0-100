@@ -35,7 +35,7 @@ For example, replay evidence needs the row set before and after a second ingesti
 
 ## 10.3.3 — Demonstrate intermediate state
 
-For the ten-row fixture, first ingestion inserts ten rows. Replay adds none. Node01's mean is 30; node02's is 60. Mean validation/test pooled MAE is 10/15; persistence is 5/10. No CPU exceeds 80 in this fixture, so add a separate boundary fixture or test for 79, 80, and 81. Do not contaminate the evaluation dataset without retraining under a new artifact path.
+For the ten-row fixture, first ingestion inserts ten rows. Replay adds none. Node01's mean is 30; node02's is 60. Mean validation/test pooled MAE is 10/15; persistence is 5/10. No CPU exceeds 80 in this fixture, so use a separate boundary fixture or test for 79, 80, and 81.
 
 Submit malformed and conflicting imports against a disposable database and show unchanged rows afterward. Demonstrate model-output refusal, stale-model rejection, and restart behavior. Record statuses and separate stdout from stderr. Review model files to confirm there are no machine-specific hidden paths required for use.
 
@@ -45,13 +45,11 @@ Keep a stable ten-row dataset for reproducing the known metrics. Use a separate 
 
 Compare expected and actual intermediate values: inserted and unchanged counts, two training means, split counts, and four pooled MAEs. A final successful process status cannot reveal that training accidentally included a validation row or that an import briefly committed a partial batch before later cleanup.
 
-## 10.3.5 — Explain what was delivered
+## 10.3.5 — Explain the delivery and model limits
 
-The README should cover setup, schemas, commands, tests, replay policy, transaction guarantees, and recovery. `model-card.md` should name training data, splitting protocol, metrics, residual tolerance, leakage checks, and limits. If the mean loses to persistence, report that result directly. Synthetic measurements do not justify production monitoring claims.
+The README should cover setup, schemas, commands, tests, replay policy, transaction guarantees, and recovery. `model-card.md` should name training data, splitting protocol, metrics, residual tolerance, leakage checks, and the limits discussed below.
 
 List the single-writer assumption and the distinction between atomic import and crash durability. Keep source separate from generated databases and reports. Optional future work may add explicit sensor collection, a rolling evaluation protocol, or a richer predictor, but it must preserve the core's reproducible acceptance path.
-
-## 10.3.6 — Make a model card useful to another developer
 
 State the question the model answers: predict a device's CPU from its earlier supplied CPU history under a fixed chronological protocol. State what it does not measure: causal diagnosis, independently labeled anomaly accuracy, or performance on live production observations. Include the persistence comparison even when it outperforms the learned mean.
 

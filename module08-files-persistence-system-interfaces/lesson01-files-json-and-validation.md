@@ -29,13 +29,13 @@ Create the input file explicitly before running this scratch example. The `with`
 
 ## 8.1.2 — Trace the two translations
 
-JSON text is not Python source code. JSON uses `true`, `false`, and `null`; decoding produces Python `True`, `False`, and `None`. JSON arrays become lists and objects become dictionaries. A successful decode establishes syntax, not a valid reading.
+JSON text is not Python source code. JSON uses `true`, `false`, and `null`; decoding produces Python `True`, `False`, and `None`. JSON arrays become lists and objects become dictionaries. The decoded values still need the observation-schema checks.
 
 For example, `[{"device": "node01", "sequence": 0, "cpu": "80"}]` is syntactically valid JSON but violates this course's numeric CPU contract. Explicitly distinguish syntax errors, shape errors, and domain errors when reporting failures. The user can then fix the relevant part instead of guessing what “invalid file” means.
 
 ## 8.1.3 — Validate the entire shape
 
-Check the top-level list, then each mapping's fields, types, and ranges. Python's decoder can accept nonstandard `NaN` tokens by default; domain validation must still reject non-finite values. For this course, reject unknown fields and duplicate `(device, sequence)` identities within one batch. Duplicate JSON object keys are a separate ambiguity from duplicate observation identities; they need a decoder-level check, described next.
+Validate from the outer structure inward: the top-level list and record count, each mapping's exact fields, field types, numeric ranges, and batch identity uniqueness. Python's decoder can accept nonstandard `NaN` tokens by default; domain validation must still reject non-finite values. Duplicate JSON field names require the separate decoder-level check described next.
 
 Do not convert `null`, `"80"`, or `true` into valid readings. A format-specific adapter may support numeric text in another application, but the capstone JSON schema requires numbers.
 
@@ -43,7 +43,7 @@ Do not convert `null`, `"80"`, or `true` into valid readings. A format-specific 
 
 The JSON text `{"cpu": 20, "cpu": 90}` contains a repeated key. By the time an ordinary dictionary reaches domain validation, only the last value is normally visible. `object_pairs_hook` lets the decoder supply the original ordered pairs to a function that you write. That function checks for repeated names while constructing a mapping and raises on repetition. This is different from finding two separate observations with the same `(device, sequence)`.
 
-Validation order should follow the structure: top-level list and record count, mapping shape and fields, field types, numeric ranges, then batch identity uniqueness. Checking an assumption after code already depends on it can produce misleading errors; for example, indexing a string as if it were a record should not be the first shape check.
+The outer-to-inner order matters: indexing a string as if it were a record can produce a misleading error before the program has established that the record is a mapping.
 
 ## 8.1.5 — Limits have a scope
 

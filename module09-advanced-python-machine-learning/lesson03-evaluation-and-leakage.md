@@ -49,7 +49,7 @@ A random split would let later readings influence a predictor evaluated on earli
 
 ## 9.3.6 — Measurement has limits
 
-Report sample counts and per-device MAE as well as pooled MAE across all held-out rows. Do not average device MAEs without naming the weighting choice. A drifting device can make an old mean obsolete. Synthetic fixtures prove arithmetic and mechanics; they do not establish real anomaly-detection quality.
+Report sample counts with the per-device and pooled metrics so their weighting remains visible. A drifting device can make an old mean obsolete. Synthetic fixtures prove arithmetic and mechanics; they do not establish real anomaly-detection quality.
 
 Residual labels have no accuracy metric here because the observations have no independent ground-truth anomaly labels. Do not call every residual above 15 a confirmed incident. Mother's final report must separate predictive error, residual flags, and fixed-threshold status.
 

@@ -40,11 +40,9 @@ The sample record intentionally omits validation so the generated behavior is vi
 
 A finite CPU is an ordinary numeric value rather than positive/negative infinity or NaN (“not a number”). `math.isfinite(value)` checks this once you have established that the input is numeric. For the exercise, accept integers or floats but explicitly exclude booleans: Python permits `True` in many integer operations, while the measurement contract does not treat it as CPU 1. Check field type before range so the rejection describes the actual problem.
 
-## 5.2.3 — Frozen does not mean deeply immutable
+## 5.2.3 — Frozen records and snapshot ownership
 
-`frozen=True` rejects ordinary field assignment. If a field refers to a list, that list can still change. Use immutable field values for a small value record. Equality compares the declared fields; two equal records need not be the same object. Revisit `==` versus `is` from Module 03.
-
-## 5.2.4 — Follow the references in a snapshot
+`frozen=True` rejects ordinary field assignment. If a field refers to a list, that list can still change. Use immutable field values for a small value record. The equality result above is value equality, not the `is` identity check from Module 03.
 
 A tuple is an immutable sequence: it preserves order and supports indexing, but has no list-style `append` operation. Consider this separate reference experiment:
 
@@ -57,11 +55,11 @@ print(snapshot[0]["cpu"])
 
 The result is `90`. The tuple's membership did not change; the object at its first position did. This is the same shallow-versus-nested ownership issue encountered in Module 03. A tuple of frozen records with only immutable fields provides a stronger practical snapshot than a tuple of mutable dictionaries.
 
-For Mother, retaining an observation means preserving what was observed, not preserving a live view of a dictionary somebody else continues to edit. A history owner can return a snapshot collection while retaining control over additions. Avoid exposing an internal list merely because it is convenient to print.
+For Mother, retaining an observation means preserving what was observed, not retaining a live view of a dictionary somebody else continues to edit.
 
 **Design principle:** Select record and container types together; immutability of an outer container says nothing by itself about its elements.
 
-## 5.2.5 — Composition gives state an owner
+## 5.2.4 — Composition gives state an owner
 
 A history object can **contain** readings. This is composition: history has readings; it is not a special kind of reading. Have `History.__init__` create its own empty list. Expose `add(reading)` and a `snapshot()` returning a tuple. Returning the internal list would let callers modify history without using its interface. Use the snapshot reasoning above to decide whether the contained records are stable too.
 

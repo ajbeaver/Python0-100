@@ -51,23 +51,19 @@ For a batch [79, 80, 81] and threshold 80, trace the responsibility sequence:
 
 These are stages of one use case, not necessarily four classes. The diagram is useful because it identifies where a defect belongs. Wrong text with correct Booleans suggests formatting; wrong Booleans suggests policy or input; missing output may be orchestration.
 
-## 6.1.3 — Dependencies point toward stable meaning
+## 6.1.3 — Dependency direction and module boundaries
 
 A useful graph is `__main__ -> service -> domain`, with input/output adapters also using domain records. Domain code must not import the command entry point or know the database filename. The entry point assembles concrete components. A service coordinates a use case; it should not become a global bag of unrelated utilities.
 
 Keep the diagram proportionate to the program: splitting every function into a separate file creates navigation work without necessarily improving independence.
 
-## 6.1.4 — Read dependencies as knowledge
-
 An arrow from `service` to `domain` means service code knows domain names and contracts. It does not mean domain code calls the service back. Keeping dependencies acyclic makes initialization easier and allows the domain to be imported without starting the application.
 
-Whole-batch rejection adds another important boundary. Validation may create temporary records for earlier rows, but it should not publish a successful partial batch when a later row is invalid. In-memory construction is preparation; storing or printing accepted results is an observable effect. The future persistence layer will preserve this distinction with a transaction.
+## 6.1.4 — Define failure and ordering
+
+State whether a batch preserves input order and whether malformed records cause whole-batch rejection or partial success. The capstone uses whole-batch rejection: an invalid last row must not leave earlier rows stored or reported as successful. Creating temporary validated records is preparation; publishing them is an observable effect. This distinction will determine the database transaction boundary in Module 08.
 
 **Design principle:** Choose boundaries around independently changing responsibilities, then specify what becomes observable on success and failure.
-
-## 6.1.5 — Define failure and ordering
-
-State whether a batch preserves input order, rejects the entire batch on any malformed record, or reports partial success. We will use whole-batch rejection for capstone imports. An invalid last row must not leave earlier rows silently stored. This decision will determine the database transaction boundary in Module 08.
 
 ## Self-review
 

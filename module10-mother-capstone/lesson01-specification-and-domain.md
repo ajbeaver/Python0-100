@@ -50,8 +50,6 @@ The capstone integrates existing techniques rather than requiring another framew
 
 List tests before implementation: equality boundary, invalid last row, replay, conflict rollback, clean restart, unknown model version, and leakage resistance. Every requirement should have observable evidence, rather than a claim that the architecture is “clean.”
 
-## 10.1.7 — Define acceptance at observable boundaries
-
 An acceptance matrix connects requirements to evidence:
 
 | Requirement | Evidence to retain |
