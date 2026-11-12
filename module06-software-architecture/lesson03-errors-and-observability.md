@@ -11,7 +11,7 @@
 2. Handle exceptions at the appropriate boundary.
 3. Log context without changing results.
 
-### Failure has a shape
+## 6.3.1 — Failure has a shape
 
 Invalid input is expected at a boundary. A misspelled attribute inside a classifier is a programming defect. Converting both into “normal” gives false confidence. Define a small domain exception where it adds meaning, and catch only the errors the caller can handle.
 
@@ -31,11 +31,29 @@ def parse_cpu(raw):
 
 This example accepts numeric text and rejects non-finite floats through the range condition. Its text-conversion contract differs from the already-typed record contract in Module 05. Decide deliberately whether an input adapter accepts numeric text; never rely on annotations to make that choice. If raw JSON is required to contain numbers, check its value type before conversion.
 
-### Preserve cause, add useful context
+## 6.3.2 — Follow exception propagation
+
+When `float(raw)` raises, execution leaves that expression immediately. The matching handler translates it into `InvalidReading`. Statements after the failed conversion do not run. If a caller does not catch the new exception, it propagates outward until a handler is found or the program terminates with a traceback.
+
+The `pass` statement in the exception class means its body adds no new behavior. Inheriting from `ValueError` makes `InvalidReading` catchable either specifically or through the broader value-error family. `as exc` binds the caught exception so it can be retained as the cause.
+
+For `"bad"`, conversion fails and supplies a cause. For `"101"`, conversion succeeds but domain validation rejects the value afterward. These two paths should both be understandable to a user, while retaining different diagnostic evidence for a developer.
+
+## 6.3.3 — Preserve cause, add useful context
 
 `raise ... from exc` keeps the underlying cause in a traceback. A file parser can add the source name and record number. The CLI can print one concise diagnostic to stderr and exit nonzero. A developer can inspect a traceback while debugging. Do not use `except Exception: return []`; an empty successful batch and a failed batch have different meanings.
 
-### Logs explain execution
+## 6.3.4 — Choose the boundary that can respond
+
+A parser can identify a record number but cannot decide whether the terminal should exit. The command entry point can decide the exit status but should not guess which record failed. Let the parser add input context and let the CLI translate the documented exception into a diagnostic and failure status.
+
+An error message might say `observations.json, record 4: cpu must be between 0 and 100`. That is enough to locate the problem without printing every record. A message such as “failed” loses the evidence, while “processed 0 records” falsely resembles a successful empty import.
+
+Logs serve a different audience from returned results. A developer may enable debug logging without changing the classification result. Configuring logging on helper import would let a library unexpectedly take over the application's output policy.
+
+**Design principle:** Handle an exception where the caller can make a meaningful decision; otherwise preserve its cause and add only the context that layer knows.
+
+## 6.3.5 — Logs explain execution
 
 Use `logging.getLogger(__name__)` in reusable modules. Configure handlers and levels in the entry point. Log a batch identifier and counts, rather than whole raw records. Standard logging normally uses stderr, leaving stdout available for machine-readable output. Logging should not decide classification or substitute for a returned result.
 
@@ -51,4 +69,4 @@ Complete the [exercise specification](exercises/lesson03/lesson03.md) from empty
 
 ## Further reading
 
-- [Official Python reference](https://docs.python.org/3/tutorial/errors.html)
+- [Python tutorial — Errors and exceptions](https://docs.python.org/3/tutorial/errors.html)

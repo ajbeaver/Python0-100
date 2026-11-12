@@ -11,7 +11,7 @@
 2. Reduce a failing case.
 3. Preserve the behavioral fix in a regression test.
 
-### Start with a reproducible failure
+## 7.2.1 — Start with a reproducible failure
 
 A traceback is a path through active calls ending with an exception and message. Read the final line to identify the failure kind, then inspect your nearest relevant frame. A `KeyError` identifies a missing key; it does not tell you whether the real defect was bad input, a wrong field name, or an earlier transformation.
 
@@ -30,11 +30,32 @@ print(warnings([91, 45]))
 
 This program has no traceback because it runs successfully while computing the wrong result. Write the expected list before executing it. The smallest useful case needs one high value followed by one normal value; a list containing only high values hides the defect.
 
-### State a hypothesis and change one thing
+## 7.2.2 — Separate the symptom from the cause
+
+For the stale flag, a hand trace is more informative than a large output dump:
+
+| Iteration | CPU | Comparison | Flag before body | Flag after body |
+|---|---:|---|---|---|
+| 1 | 91 | True | False | True |
+| 2 | 45 | False | True | True |
+
+The second comparison is correct. The defect is that the false branch performs no assignment. This distinction prevents an irrelevant fix to threshold arithmetic when the real problem is state lifetime.
+
+For an exception, inspect the input at the failing frame before changing access syntax. `reading["memory"]` can raise because the schema requires only CPU, because a malformed record missed validation, or because the code misspelled a required key. Substituting `.get("memory", 0)` would suppress the symptom while inventing a zero measurement.
+
+## 7.2.3 — State a hypothesis and change one thing
 
 Hypothesis: the flag survives beyond the observation it describes. Inspect `high` on both iterations. You can insert a temporary print or use `breakpoint()`, then `next`, `print(high)`, and `continue` in the debugger. Remove temporary output before delivery. Recompute the flag for each current value, and add a test for `[91, 45] -> [True, False]`.
 
-### A regression test protects meaning
+## 7.2.4 — Use the debugger to answer one question
+
+At `breakpoint()`, `next` advances within the current frame; `step` can enter a called function; `print(expression)` inspects a value; `continue` resumes execution. Place the breakpoint immediately before the point where expectation and observation diverge. The goal is evidence for a hypothesis, not stepping through every line by habit.
+
+A minimal reproduction removes irrelevant components while retaining the failure. Two CPU readings are enough for the stale flag; a database, logging setup, and CLI are unnecessary. Keep that small case in the regression suite after fixing the implementation, then run the surrounding suite to check interactions.
+
+The original failure evidence belongs in notes, not as a permanently broken production function. Your final code should express the intended per-observation decision. Mother will benefit from a compact history of what failed and which contract the regression protects.
+
+## 7.2.5 — A regression test protects meaning
 
 First show that the test fails with the faulty implementation. Then fix it and show it passes. This establishes that the test can detect that particular bug; it does not prove the absence of every bug. Also check the opposite order and repeated values, because state-related defects often depend on sequence.
 
@@ -50,4 +71,4 @@ Complete the [exercise specification](exercises/lesson02/lesson02.md) from empty
 
 ## Further reading
 
-- [Official Python reference](https://docs.python.org/3/library/pdb.html)
+- [Python reference — pdb debugger](https://docs.python.org/3/library/pdb.html)

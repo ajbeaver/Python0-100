@@ -136,7 +136,7 @@ Use `if not history:` when you want to detect an empty collection. Later, we'll 
 
 ## 2.2.5 — The stale-state trap
 
-Here is a subtle bug from our original Lesson 5. Mother processes multiple observations:
+Consider a subtle state-lifetime bug as Mother processes multiple observations:
 
 ```python
 observations = [

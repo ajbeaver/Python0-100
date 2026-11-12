@@ -11,13 +11,19 @@
 2. Compute MAE against a baseline.
 3. Separate evaluation from tuning.
 
-### Future data must remain unseen
+## 9.3.1 — Future data must remain unseen
 
 For each device, sort unique readings by sequence and use the earliest 60% for training, the next 20% for validation, and the rest for final testing. Use `train_end = int(0.6 * n)` and `validation_end = int(0.8 * n)`, with at least five readings per device. Sequence expresses order within a device; it is not a wall-clock timestamp.
 
 Fit the mean on the training portion only. Validation may inform a later model decision. In this course, tolerance remains the declared 15; final testing is performed once after the design is fixed. Repeatedly adjusting a model to improve test results leaks information from the test into development.
 
-### Compare against something simple
+## 9.3.2 — Work through the split before computing a score
+
+With five readings, `int(0.6 * 5)` is 3 and `int(0.8 * 5)` is 4. Python slicing therefore gives training rows `[:3]`, validation rows `[3:4]`, and test rows `[4:]`. The stop index is excluded, as in Module 01's sequence examples. Splitting happens independently for each device after sorting by its integer sequence.
+
+The minimum-history rule ensures all three portions contain data for the specified ratios. It does not mean a single held-out reading is statistically persuasive. This tiny fixture exists so you can verify each stage without hiding errors in a large dataset.
+
+## 9.3.3 — Compare against something simple
 
 Mean absolute error is `sum(abs(actual - predicted)) / count`. The persistence baseline predicts every held-out value using the last training CPU for that device, held fixed across validation and test. It must not peek at preceding held-out values under this protocol. A rolling one-step forecast is a different valid experiment, but requires a different stated protocol.
 
@@ -27,9 +33,21 @@ Mean absolute error is `sum(abs(actual - predicted)) / count`. The persistence b
 | 3 | 50 | Validate |
 | 4 | 60 | Test |
 
-The mean model's validation MAE is 20 and test MAE is 30. Persistence scores 10 and 20. Learning does not guarantee improvement. An honest report should say the fitted mean loses on this trend.
+For this one-device table, the mean model's validation MAE is 20 and test MAE is 30; persistence scores 10 and 20. The fitted mean loses on this trend. The next section shows how to combine such errors across devices without hiding the weighting.
 
-### Measurement has limits
+## 9.3.4 — Follow one score all the way through
+
+For node01, train on [20, 30, 40], predict 30, then observe validation CPU 50. The absolute error is 20. For a second device whose values stay at 60, the mean is 60 and the corresponding error is 0. Pooled validation MAE is `(20 + 0) / 2 = 10`.
+
+If one device contributed ten held-out rows and another contributed one, pooled MAE would weight every row equally. Averaging two per-device MAEs would weight the devices equally instead. Either can answer a useful question, but they are not interchangeable. Record counts so a reader can interpret the aggregate.
+
+## 9.3.5 — Test leakage without requiring good predictions
+
+Change only held-out CPU values, fit again from the same training slice, and require the parameters to remain unchanged. The scores should change because the actual outcomes changed. This is a stronger test of separation than asserting that the score looks small.
+
+A random split would let later readings influence a predictor evaluated on earlier readings. That may answer a different question about a stationary dataset, but it does not represent the course's “learn from earlier observations, predict later ones” protocol. Mother retains chronological evaluation even when that makes its model's limitations more visible.
+
+## 9.3.6 — Measurement has limits
 
 Report sample counts and per-device MAE as well as pooled MAE across all held-out rows. Do not average device MAEs without naming the weighting choice. A drifting device can make an old mean obsolete. Synthetic fixtures prove arithmetic and mechanics; they do not establish real anomaly-detection quality.
 
@@ -45,4 +63,4 @@ Complete the [exercise specification](exercises/lesson03/lesson03.md) from empty
 
 ## Further reading
 
-- [Official Python reference](https://docs.python.org/3/library/statistics.html)
+- [Python reference — Statistics](https://docs.python.org/3/library/statistics.html)
